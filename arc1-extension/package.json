@@ -1,0 +1,24 @@
+{
+  "name": "bopf-enh",
+  "version": "0.1.0",
+  "description": "ARC-1 extension for classic BOPF enhancement objects",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.19"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "bundle": "esbuild src/index.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/bopf-enh.mjs && chmod 644 dist/bopf-enh.mjs",
+    "build": "npm run typecheck && npm run bundle",
+    "tools": "ARC1_PLUGINS=$PWD/dist/bopf-enh.mjs arc1-cli tools",
+    "test": "tsc -p tsconfig.test.json && node tests/run.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.0",
+    "arc-1": "1.5.0",
+    "esbuild": "0.28.2",
+    "typescript": "5.9.3",
+    "zod": "4.6.5"
+  }
+}

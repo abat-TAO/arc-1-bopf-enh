@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_MSAG" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <T100A>
+    <ARBGB>ZBE_BOPF_ENH</ARBGB>
+    <MASTERLANG>E</MASTERLANG>
+    <STEXT>BOPF enhancement API</STEXT>
+   </T100A>
+   <T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>001</MSGNR>
+     <TEXT>Business object &amp;1 does not exist</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>002</MSGNR>
+     <TEXT>Enhancement &amp;1 does not exist</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>003</MSGNR>
+     <TEXT>Unknown resource &amp;1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>004</MSGNR>
+     <TEXT>Parameter &amp;1 is required</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>HTTP method &amp;1 is not supported for resource &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>006</MSGNR>
+     <TEXT>Request body is not valid JSON</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>007</MSGNR>
+     <TEXT>Operation &amp;1 is not supported</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>008</MSGNR>
+     <TEXT>&amp;1 is not in the customer namespace and cannot be changed</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>009</MSGNR>
+     <TEXT>Business object &amp;1 cannot be enhanced</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>010</MSGNR>
+     <TEXT>Node &amp;1 does not exist in &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>011</MSGNR>
+     <TEXT>Node &amp;1 of the base business object is not extensible</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>012</MSGNR>
+     <TEXT>Action &amp;1 does not exist in &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>013</MSGNR>
+     <TEXT>Action &amp;1 of the base business object is not extensible</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>014</MSGNR>
+     <TEXT>Name &amp;1 is not valid: &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>015</MSGNR>
+     <TEXT>&amp;1 already exists as enhancement of &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>016</MSGNR>
+     <TEXT>No authorization to change &amp;1 in package &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>017</MSGNR>
+     <TEXT>Package &amp;1 records changes: a transport request is required</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>018</MSGNR>
+     <TEXT>BOPF did not save &amp;1 &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>019</MSGNR>
+     <TEXT>CSRF token is missing or invalid</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>020</MSGNR>
+     <TEXT>Value &amp;1 is not allowed for &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>021</MSGNR>
+     <TEXT>&amp;1 is not a modifiable workbench request or task</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>022</MSGNR>
+     <TEXT>&amp;1 enhancement of action &amp;2 already exists: &amp;3</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>023</MSGNR>
+     <TEXT>DDIC object &amp;1 does not exist or is not active</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>024</MSGNR>
+     <TEXT>Language &amp;1 does not exist</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>025</MSGNR>
+     <TEXT>&amp;1 &amp;2 does not exist in &amp;3</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>026</MSGNR>
+     <TEXT>&amp;1 &amp;2 belongs to the base business object and cannot be changed</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>027</MSGNR>
+     <TEXT>Delete token is missing or outdated; read the delete preview again</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>028</MSGNR>
+     <TEXT>Database table &amp;1 contains data and is not deleted</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>029</MSGNR>
+     <TEXT>BOPF did not delete &amp;1 &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>030</MSGNR>
+     <TEXT>&amp;1 is locked by user &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>031</MSGNR>
+     <TEXT>&amp;3: no association from node &amp;1 to node &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>032</MSGNR>
+     <TEXT>Database table name &amp;1 is not valid or exists; pass databaseTable</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>033</MSGNR>
+     <TEXT>Data of database table &amp;1 could not be checked; it is not deleted</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>034</MSGNR>
+     <TEXT>&amp;1 is not a valid new name for &amp;2 or already exists</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBE_BOPF_ENH</ARBGB>
+     <MSGNR>035</MSGNR>
+     <TEXT>&amp;1: combinedStructure, combinedTableType and databaseTable must differ</TEXT>
+    </T100>
+   </T100>
+  </asx:values>
+ </asx:abap>
+</abapGit>
