@@ -31,41 +31,42 @@ validations, queries, associations and alternative keys.
 This path runs ARC-1 locally, started by your MCP client. For Docker and SAP BTP, see [Deployment](#deployment).
 
 **You need** an SAP system with classic BOPF, tested with S/4HANA 2025 (SAP_BASIS 816) on-premise (private cloud
-and older releases should work but are not tested yet); [abapGit](https://abapgit.org) in that system; an SAP user
-with developer authorization (`S_DEVELOP`) for the packages of the enhancements; and, to build the extension,
-Node.js 22.19 or later on Linux, macOS or WSL (the build scripts use POSIX shell commands).
+and older releases should work but are not tested yet); [abapGit](https://abapgit.org) in that system; and an SAP
+user with developer authorization (`S_DEVELOP`) for the packages of the enhancements. Building the extension
+yourself also needs Node.js 22.19 or later on Linux, macOS or WSL (the build scripts use POSIX shell commands).
 
 1. **Set up ARC-1 first.** Follow ARC-1's [quickstart](https://docs.arc-1-mcp.com/quickstart/) and check that your
    agent can read an ABAP object through it. The extension only adds tools to a working ARC-1.
-2. **Get the repository.**
+2. **Import the ABAP objects.** In abapGit, create an online repository with
+   `https://github.com/abat-TAO/arc-1-bopf-enh` in a package of your choice, for example the local package
+   `$ZBE_BOPF_ENH`, and pull. Without access to GitHub from the SAP system, import
+   `arc-1-bopf-enh-abap-<version>.zip` from the [latest release](https://github.com/abat-TAO/arc-1-bopf-enh/releases/latest)
+   as an offline repository instead. abapGit creates and activates the ICF node `/sap/bc/zbe_bopf_enh/`.
+3. **Get the extension.** Download `bopf-enh.mjs` from the
+   [latest release](https://github.com/abat-TAO/arc-1-bopf-enh/releases/latest), with `THIRD-PARTY-NOTICES.md` next
+   to it. Or build it yourself; the result is `arc1-extension/dist/bopf-enh.mjs`:
    ```bash
    git clone https://github.com/abat-TAO/arc-1-bopf-enh.git
-   cd arc-1-bopf-enh
+   cd arc-1-bopf-enh/arc1-extension && npm ci --ignore-scripts && npm run build
    ```
-3. **Import the ABAP objects.** In abapGit, create an online repository with
-   `https://github.com/abat-TAO/arc-1-bopf-enh` in a package of your choice, for example the local package
-   `$ZBE_BOPF_ENH`, and pull. abapGit creates and activates the ICF node `/sap/bc/zbe_bopf_enh/`.
-4. **Build the extension.** The result is one file, `arc1-extension/dist/bopf-enh.mjs`.
-   ```bash
-   cd arc1-extension && npm ci --ignore-scripts && npm run build
-   ```
-5. **Add it to ARC-1.** Extend the `env` block of the ARC-1 server in your MCP client configuration and restart the
+4. **Add it to ARC-1.** Extend the `env` block of the ARC-1 server in your MCP client configuration and restart the
    client:
    ```json
-   "ARC1_PLUGINS": "<absolute path>/arc1-extension/dist/bopf-enh.mjs",
+   "ARC1_PLUGINS": "<absolute path>/bopf-enh.mjs",
    "SAP_ALLOW_WRITES": "true",
    "SAP_ALLOW_PLUGIN_RAW_WRITES": "true",
    "SAP_ALLOWED_PACKAGES": "$TMP,ZTM_EXT"
    ```
-6. **Try it.** Ask your agent *"Which enhancements does /BOBF/EPM_SALES_ORDER have?"*, or call the tool from
-   `arc1-extension` with ARC-1's command line client and the same `SAP_*` settings in your shell:
+5. **Try it.** Ask your agent *"Which enhancements does /BOBF/EPM_SALES_ORDER have?"*. If you built the extension
+   yourself, you can also call the tool from `arc1-extension` with ARC-1's command line client and the same `SAP_*`
+   settings in your shell:
    ```bash
    ARC1_PLUGINS=$PWD/dist/bopf-enh.mjs npx arc1-cli call Custom_BopfEnhRead --json '{"what":"businessObjects"}'
    ```
 
 **Other object names.** All objects carry the code `BE` (`ZCL_BE_*`, `ZBE_*`, `$ZBE_BOPF_ENH`, ICF node
-`zbe_bopf_enh`). If these names are taken in your system, rename your local copy after step 2, from the repository
-root:
+`zbe_bopf_enh`). If these names are taken in your system, the release files do not fit: clone the repository and
+rename it from its root before steps 2 and 3:
 
 ```bash
 node tools/rename.mjs --code XY --dry-run   # preview
@@ -74,9 +75,9 @@ node tools/rename.mjs --code XY             # ZCL_BE_ → ZCL_XY_, ZBE_ → ZXY_
 
 The script renames the abapGit files and their contents, the extension with its service path, the tests and the
 documentation, recomputes the file name of the ICF node and checks SAP's name length limits. `--map renames.json`
-renames single objects. In step 3, import the renamed objects instead of the original ones: push your copy to your
-own Git repository and use its URL, or zip it (with `.abapgit.xml` and `src/`) and import it as an offline
-repository. Then continue with step 4.
+renames single objects. In step 2, import the renamed objects: push your copy to your own Git repository and use its
+URL, or zip it (with `.abapgit.xml` and `src/`) and import it as an offline repository. In step 3, build the
+extension from your copy.
 
 ## Deployment
 

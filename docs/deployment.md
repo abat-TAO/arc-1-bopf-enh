@@ -1,7 +1,8 @@
 # Deployment
 
-The extension is one JavaScript file, `arc1-extension/dist/bopf-enh.mjs`, that ARC-1 loads at startup. How the file
-gets to ARC-1 depends on how ARC-1 runs. Set up ARC-1 first with its own
+The extension is one JavaScript file, `bopf-enh.mjs`, that ARC-1 loads at startup. Download it from the
+[latest release](https://github.com/abat-TAO/arc-1-bopf-enh/releases/latest), or build it as described in the
+README. How the file gets to ARC-1 depends on how ARC-1 runs. Set up ARC-1 first with its own
 [deployment documentation](https://docs.arc-1-mcp.com/deployment/) and make sure a plain read works; then add the
 extension as described here.
 
@@ -67,12 +68,13 @@ configuration, next to the SAP connection settings, and restart the client:
 
 ## Docker
 
-Build an image on top of ARC-1's image that contains the extension. Copy the file with `--chown`: ARC-1 runs as the
-user `arc1`, and a file copied as `root` is refused.
+Build an image on top of ARC-1's image that contains the extension. Put `bopf-enh.mjs` and `THIRD-PARTY-NOTICES.md`
+from the release next to the Dockerfile and copy them with `--chown`: ARC-1 runs as the user `arc1`, and a file
+copied as `root` is refused.
 
 ```dockerfile
 FROM ghcr.io/arc-mcp/arc-1:1.5.0
-COPY --chown=arc1:arc1 arc1-extension/dist/bopf-enh.mjs /home/arc1/plugins/bopf-enh/bopf-enh.mjs
+COPY --chown=arc1:arc1 bopf-enh.mjs THIRD-PARTY-NOTICES.md /home/arc1/plugins/bopf-enh/
 ENV ARC1_PLUGINS=/home/arc1/plugins/bopf-enh/bopf-enh.mjs \
     SAP_ALLOW_WRITES=true \
     SAP_ALLOW_PLUGIN_RAW_WRITES=true
@@ -82,8 +84,9 @@ Run it like ARC-1's own image ([Docker guide](https://docs.arc-1-mcp.com/docker/
 and the connection settings at runtime. Mounting the file into the stock image instead works only if its owner on
 the host has the user ID of `arc1` in the container.
 
-The bundle contains the library zod. If you pass the image on to others, add zod's license text
-(`arc1-extension/node_modules/zod/LICENSE`) next to the bundle; the same applies to the application files on SAP BTP.
+The bundle contains the library zod, whose license text is in `THIRD-PARTY-NOTICES.md`; keep that file next to the
+bundle, also in the application files on SAP BTP. If you build the bundle yourself, use
+`arc1-extension/node_modules/zod/LICENSE` instead.
 
 ## SAP BTP Cloud Foundry
 
