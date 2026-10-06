@@ -28,7 +28,7 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --yes @abaplint/cli@2.120.60 --format checkstyle > abaplint.xml || true
+          npx --yes @abaplint/cli@2.120.68 --format checkstyle > abaplint.xml || true
           reviewdog -f=checkstyle -name=abaplint -reporter=github-pr-check \
             -filter-mode=added -fail-level=error < abaplint.xml
 
