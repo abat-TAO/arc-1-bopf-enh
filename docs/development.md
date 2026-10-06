@@ -106,4 +106,19 @@ Most of its size is zod, the schema library of the tool parameters. `dist/` is n
 | [abaplint](https://github.com/abaplint/abaplint), [abaplint/deps](https://github.com/abaplint/deps) | MIT | ABAP code checks |
 | [abapGit](https://github.com/abapGit/abapGit) | MIT | Import into the SAP system |
 
-A distributed copy of the bundle contains zod and therefore has to carry zod's license text.
+A distributed copy of the bundle contains zod and therefore has to carry zod's license text; releases ship it as
+`THIRD-PARTY-NOTICES.md`.
+
+## Releases
+
+A release is a tag `v<version>` on `main` with four files built from exactly that tag:
+
+| File | How |
+|---|---|
+| `bopf-enh.mjs` | `npm ci --ignore-scripts && npm run build` in a clean checkout of the tag (`git worktree add --detach <dir> v<version>`); the build is reproducible |
+| `arc-1-bopf-enh-abap-v<version>.zip` | `git archive --format=zip -o <file> v<version> .abapgit.xml src`, for abapGit offline imports |
+| `THIRD-PARTY-NOTICES.md` | Name, version and license text of zod from `arc1-extension/node_modules/zod` |
+| `SHA256SUMS` | `sha256sum` of the three files above |
+
+Set the plugin version in `arc1-extension/src/index.ts` and `arc1-extension/package.json` to the release version
+before tagging. Publish with `gh release create v<version> --latest` and the four files.
