@@ -286,6 +286,34 @@ withPolicy(async (suite) => {
     const refresh = { operation: 'refresh', enhancement: 'ZBE_TEST_SO', transport: 'A4HK900001' };
     assert.deepEqual(refreshed.calls.map(call => call.body), [{ ...refresh, dryRun: true }, refresh]);
   });
+  await suite.test('maintain routes correct through a dry run and uppercases the transport', async () => {
+    const { ctx, calls } = mockHttp(plan, saved);
+    const result = await maintainTool.handler({ operation: 'correct', enhancement: 'zbe_test_so', transport: 'a4hk900001' }, ctx);
+    assert.equal(result.isError, undefined);
+    assert.equal(text(result), saved.body);
+    const correct = { operation: 'correct', enhancement: 'ZBE_TEST_SO', transport: 'A4HK900001' };
+    assert.deepEqual(calls.map(call => call.body), [{ ...correct, dryRun: true }, correct]);
+    assert.ok(calls.every(call => call.method === 'POST' && call.path.endsWith('/write') && call.contentType === 'application/json'));
+  });
+  await suite.test('maintain correct dryRun returns the preview without a second POST', async () => {
+    const preview = json({ result: { operation: 'correct', enhancement: 'ZBE_TEST_SO', package: '$TMP', dryRun: true } });
+    const { ctx, calls } = mockHttp(preview);
+    const result = await maintainTool.handler({ operation: 'correct', enhancement: 'zbe_test_so', dryRun: true }, ctx);
+    assert.equal(result.isError, undefined);
+    assert.equal(text(result), preview.body);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].method, 'POST');
+    assert.deepEqual(calls[0].body, { operation: 'correct', enhancement: 'ZBE_TEST_SO', dryRun: true });
+  });
+  await suite.test('maintain correct stops before the real POST when the package is denied', async () => {
+    const { ctx, calls } = mockHttp(json({ result: { package: 'ZBAD' } }));
+    const result = await maintainTool.handler({ operation: 'correct', enhancement: 'zbe_test_so' }, ctx);
+    assert.equal(result.isError, true);
+    assert.match(text(result), /Package ZBAD/);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].method, 'POST');
+    assert.deepEqual(calls[0].body, { operation: 'correct', enhancement: 'ZBE_TEST_SO', dryRun: true });
+  });
 });
 
 // Suspicious behavior: a leading brace is accepted without validating the JSON error body.
@@ -376,6 +404,11 @@ test('maintain check description documents both finding lists and entity locatio
     assert.ok(operation.includes(field), `Missing check result field ${field}`);
   }
   assert.match(operation, /no entity: the enhancement as a whole/);
+});
+
+test('maintain schema accepts correct', () => {
+  const schema = maintainTool.schema as z.ZodObject;
+  assert.equal(schema.safeParse({ operation: 'correct', enhancement: 'ZBE_TEST_SO' }).success, true);
 });
 
 for (const scope of ['own', 'all'] as const) {

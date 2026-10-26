@@ -6,14 +6,14 @@ README. How the file gets to ARC-1 depends on how ARC-1 runs. Set up ARC-1 first
 [deployment documentation](https://docs.arc-1-mcp.com/deployment/) and make sure a plain read works; then add the
 extension as described here.
 
-The extension is tested only with S/4HANA 2025 (SAP_BASIS 816) on-premise. Private cloud and older releases such as
-S/4HANA 2023 should work as well but are not tested yet.
+The extension is tested with S/4HANA 2023 (SAP_BASIS 758) and S/4HANA 2025 (SAP_BASIS 816) on-premise. Private
+cloud and older releases should work as well but are not tested yet.
 
 ## Supported setups
 
 | ARC-1 runs | SAP system | Status |
 |---|---|---|
-| Locally, started by the MCP client (`npx arc-1`) | On-premise | Supported, verified with S/4HANA 2025 |
+| Locally, started by the MCP client (`npx arc-1`) | On-premise | Supported, verified with S/4HANA 2023 and 2025 |
 | Locally, started by the MCP client (`npx arc-1`) | Private cloud | Supported, not verified yet |
 | Docker on a VM or container host | On-premise or private cloud | Supported, not verified yet |
 | SAP BTP Cloud Foundry, single target (`/mcp`) | On-premise or private cloud through the Cloud Connector | Supported, not verified yet |
@@ -73,7 +73,7 @@ from the release next to the Dockerfile and copy them with `--chown`: ARC-1 runs
 copied as `root` is refused.
 
 ```dockerfile
-FROM ghcr.io/arc-mcp/arc-1:1.5.0
+FROM ghcr.io/arc-mcp/arc-1:1.9.0
 COPY --chown=arc1:arc1 bopf-enh.mjs THIRD-PARTY-NOTICES.md /home/arc1/plugins/bopf-enh/
 ENV ARC1_PLUGINS=/home/arc1/plugins/bopf-enh/bopf-enh.mjs \
     SAP_ALLOW_WRITES=true \

@@ -1,5 +1,5 @@
 "! Write access to classic BOPF enhancement objects through /BOBF/CL_CONF_MODEL_API.
-"! One request is one change: checked first, then written, then read back.
+"! One request is one change: checked first, then written, read back and corrected with Check & Correct.
 CLASS zcl_be_writer DEFINITION
   PUBLIC
   FINAL
@@ -76,18 +76,20 @@ CLASS zcl_be_writer DEFINITION
 
     TYPES:
       BEGIN OF result,
-        operation       TYPE string,
-        enhancement     TYPE string,
-        entity_type     TYPE string,
-        entity          TYPE string,
-        class           TYPE string,
-        generated       TYPE generated_objects,
-        package         TYPE string,
-        transport       TYPE string,
-        language        TYPE string,
-        dry_run         TYPE abap_bool,
-        already_existed TYPE abap_bool,
-        unchanged       TYPE abap_bool,
+        operation         TYPE string,
+        enhancement       TYPE string,
+        entity_type       TYPE string,
+        entity            TYPE string,
+        class             TYPE string,
+        generated         TYPE generated_objects,
+        package           TYPE string,
+        transport         TYPE string,
+        language          TYPE string,
+        dry_run           TYPE abap_bool,
+        already_existed   TYPE abap_bool,
+        unchanged         TYPE abap_bool,
+        "! The change is saved, but Check & Correct failed afterwards
+        correction_failed TYPE abap_bool,
       END OF result.
 
     CONSTANTS:
@@ -495,6 +497,13 @@ CLASS zcl_be_writer DEFINITION
         name        TYPE string
       RAISING
         zcx_be_error.
+
+    "! Check & Correct of the changed enhancement, in the package and transport of the change
+    METHODS correct
+      IMPORTING
+        change TYPE result
+      RAISING
+        zcx_be_error.
 ENDCLASS.
 
 
@@ -605,6 +614,17 @@ CLASS zcl_be_writer IMPLEMENTATION.
       WHEN OTHERS.
         RAISE EXCEPTION TYPE zcx_be_error MESSAGE e007(zbe_bopf_enh) WITH request-operation EXPORTING status = 400.
     ENDCASE.
+
+    " The configuration API leaves entries behind that the consistency check reports as lost elements
+    IF result-dry_run = abap_false AND result-already_existed = abap_false AND result-unchanged = abap_false.
+      TRY.
+          correct( result ).
+        CATCH cx_root.
+          " The change is saved; the caller learns it from the result instead of repeating the change, and
+          " the maintenance operation correct reports the cause
+          result-correction_failed = abap_true.
+      ENDTRY.
+    ENDIF.
   ENDMETHOD.
 
 
@@ -1554,6 +1574,20 @@ CLASS zcl_be_writer IMPLEMENTATION.
       zcx_be_error=>raise_not_saved( entity_type = entity_type
                                      name        = name ).
     ENDIF.
+  ENDMETHOD.
+
+
+  METHOD correct.
+    DATA(enhancement) = NEW zcl_be_change_context( )->find_enhancement( change-enhancement ).
+    DATA(session) = NEW zcl_be_session( package = CONV #( change-package )
+                                        request = CONV #( change-transport ) ).
+    TRY.
+        NEW zcl_be_meta_model( )->correct( bo_key = enhancement-bo_key
+                                           name   = enhancement-bo_name ).
+      CLEANUP.
+        session->close( ).
+    ENDTRY.
+    session->close( ).
   ENDMETHOD.
 
 

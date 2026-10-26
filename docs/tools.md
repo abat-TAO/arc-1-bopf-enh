@@ -110,6 +110,12 @@ are described in the tool schema.
 - `alreadyExisted`: an entity with this name exists, and the create changed nothing. Its definition is not compared
   with the request; read it to compare;
 - `unchanged`: an update of an entity got the values it already has. `updateEnhancement` does not report it.
+- `correctionFailed`: the change is saved, but the Check & Correct after it failed; run `Custom_BopfEnhMaintain`
+  `correct`.
+
+**Check & Correct.** SAP's configuration API leaves configuration entries behind that its own consistency check
+reports as lost elements ("Run Check & Correct"). Every saved change therefore ends with Check & Correct, as in the
+BOPF designer; dry runs and changes that change nothing (`alreadyExisted`, `unchanged`) do not run it.
 
 **Names.** Without explicit names, SAP's proposals are used. New names must not exist yet and must be valid customer
 names. Implementation classes are generated as stubs, or reused when the class already exists.
@@ -158,6 +164,10 @@ database table contains data is not deleted. `entityType` is one of `enhancement
 `actionEnhancement`, `determination`, `validation`, `query`, `association` and `alternativeKey`; `enhancement` deletes
 the enhancement object with all its entities and its constants interface.
 
+Deleting entities ends with Check & Correct, like every change. It also removes configuration entries that nothing
+uses anymore; the preview does not list them. `correctionFailed` means the deletion is done, but the correction
+failed.
+
 ## Custom_BopfEnhMaintain
 
 **`check`** runs the BOPF consistency check of the enhancement, as the BOPF designer does, and changes nothing.
@@ -184,7 +194,18 @@ Example contents of `result`:
 }
 ```
 
-**`refresh`** regenerates the constants interface of the enhancement and invalidates the runtime buffer of the
-enhancement and its standard object. It is needed after appends to standard nodes and after changes of the data
-structure of own subnodes. Like a write, it runs as a dry run first; `dryRun: true` checks only authorization,
-package and transport.
+Findings like the one of the enhancement in this example come from changes made without these tools or with a
+version before 0.2.0; `correct` removes them.
+
+**`correct`** runs Check & Correct of the BOPF designer: it removes the configuration entries the check reports as
+lost elements, regenerates the constants interface and saves. Changes through the tools end with it anyway; run it
+for enhancements changed elsewhere, when the check says "Run Check & Correct", or after a result with
+`correctionFailed`.
+
+**`refresh`** regenerates the constants interface of the enhancement, runs Check & Correct and invalidates the
+runtime buffer of the enhancement and its standard object. It is needed after appends to standard nodes and after
+changes of the data structure of own subnodes. `correctionFailed` means the constants interface is regenerated, but
+the correction failed.
+
+Like a write, `correct` and `refresh` run as a dry run first; `dryRun: true` checks only authorization, package and
+transport.

@@ -1,6 +1,6 @@
 {
   "name": "bopf-enh",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "ARC-1 extension for classic BOPF enhancement objects",
   "private": true,
   "type": "module",
@@ -16,9 +16,9 @@
   },
   "devDependencies": {
     "@types/node": "24.19.0",
-    "arc-1": "1.5.0",
+    "arc-1": "1.9.0",
     "esbuild": "0.28.2",
     "typescript": "5.9.3",
-    "zod": "4.6.5"
+    "zod": "4.6.7"
   }
 }

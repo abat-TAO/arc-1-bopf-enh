@@ -48,6 +48,15 @@ CLASS zcl_be_meta_model DEFINITION
       RAISING
         zcx_be_error.
 
+    "! Check & Correct of the BOPF designer: removes the configuration entries that the configuration API leaves
+    "! behind and the consistency check reports as lost elements, regenerates the constants interface and saves
+    METHODS correct
+      IMPORTING
+        bo_key TYPE /bobf/obm_bo_key
+        name   TYPE csequence
+      RAISING
+        zcx_be_error.
+
     "! Consistency check of the active version of an enhancement, as the BOPF designer runs it. Findings
     "! located at entities or the version of the base business object are SAP's and come as base findings.
     METHODS check
@@ -244,6 +253,34 @@ CLASS zcl_be_meta_model IMPLEMENTATION.
            modifications = modifications
            entity_type   = `action`
            name          = name ).
+  ENDMETHOD.
+
+
+  METHOD correct.
+    DATA(version_key) = get_version_key( bo_key ).
+    DATA(transaction_manager) = /bobf/cl_tra_trans_mgr_factory=>get_transaction_manager( ).
+    DATA(service_manager) = /bobf/cl_tra_serv_mgr_factory=>get_service_manager( /bobf/if_conf_obj_c=>sc_bo_key ).
+    transaction_manager->cleanup( ).
+
+    " The sequence of /BOBF/CL_CONF_MODEL_API=>DELETE_ASSOCIATION, the only API method that corrects
+    service_manager->do_action( EXPORTING iv_act_key    = /bobf/if_conf_obj_c=>sc_action-version-check_and_correct
+                                          it_key        = VALUE #( ( key = version_key ) )
+                                IMPORTING eo_message    = DATA(correct_messages)
+                                          et_failed_key = DATA(failed_keys) ).
+    IF failed_keys IS NOT INITIAL.
+      transaction_manager->cleanup( ).
+      zcx_be_error=>raise_not_corrected( name     = name
+                                         messages = correct_messages ).
+    ENDIF.
+    service_manager->do_action( iv_act_key = /bobf/if_conf_obj_c=>sc_action-version-generate_const_if
+                                it_key     = VALUE #( ( key = version_key ) ) ).
+    transaction_manager->save( IMPORTING ev_rejected = DATA(rejected)
+                                         eo_message  = DATA(save_messages) ).
+    transaction_manager->cleanup( ).
+    IF rejected = abap_true.
+      zcx_be_error=>raise_not_corrected( name     = name
+                                         messages = save_messages ).
+    ENDIF.
   ENDMETHOD.
 
 

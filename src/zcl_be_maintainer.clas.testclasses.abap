@@ -8,6 +8,10 @@ CLASS ltcl_enhancement_maintainer DEFINITION FINAL FOR TESTING RISK LEVEL HARMLE
     METHODS reject_unknown_enhancement FOR TESTING RAISING cx_static_check.
     METHODS reject_base_as_enhancement FOR TESTING RAISING cx_static_check.
     METHODS check_fixture_read_only FOR TESTING RAISING cx_static_check.
+    METHODS correct_fixture_dry_run FOR TESTING RAISING cx_static_check.
+    METHODS correct_rejects_unknown FOR TESTING RAISING cx_static_check.
+    METHODS correct_rejects_base FOR TESTING RAISING cx_static_check.
+    METHODS refresh_fixture_dry_run FOR TESTING RAISING cx_static_check.
 ENDCLASS.
 CLASS ltcl_enhancement_maintainer IMPLEMENTATION.
   METHOD require_fixture.
@@ -57,6 +61,59 @@ CLASS ltcl_enhancement_maintainer IMPLEMENTATION.
           status = 404
           number = '002' ).
     ENDTRY.
+  ENDMETHOD.
+
+  METHOD correct_fixture_dry_run.
+    require_fixture( ).
+    DATA(result) = NEW zcl_be_maintainer( )->correct( VALUE #( enhancement = 'zbe_test_so' dry_run = abap_true ) ).
+    cl_abap_unit_assert=>assert_equals(
+      act = result-operation
+      exp = zcl_be_maintainer=>operation-correct ).
+    cl_abap_unit_assert=>assert_equals(
+      act = result-enhancement
+      exp = 'ZBE_TEST_SO' ).
+    cl_abap_unit_assert=>assert_equals(
+      act = result-constants_interface
+      exp = 'ZIF_BE_TEST_SO_C' ).
+    cl_abap_unit_assert=>assert_equals(
+      act = result-package
+      exp = '$TMP' ).
+    cl_abap_unit_assert=>assert_true( result-dry_run ).
+    cl_abap_unit_assert=>assert_false( result-correction_failed ).
+  ENDMETHOD.
+
+  METHOD correct_rejects_unknown.
+    TRY.
+        NEW zcl_be_maintainer( )->correct( VALUE #( enhancement = 'ZBE_UNIT_DOES_NOT_EXIST' dry_run = abap_true ) ).
+        cl_abap_unit_assert=>fail( 'Expected ZBE_BOPF_ENH 001' ).
+      CATCH zcx_be_error INTO DATA(error).
+        assert_error(
+          error  = error
+          status = 404
+          number = '001' ).
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD correct_rejects_base.
+    TRY.
+        NEW zcl_be_maintainer( )->correct( VALUE #( enhancement = '/BOBF/EPM_SALES_ORDER' dry_run = abap_true ) ).
+        cl_abap_unit_assert=>fail( 'Expected ZBE_BOPF_ENH 002' ).
+      CATCH zcx_be_error INTO DATA(error).
+        assert_error(
+          error  = error
+          status = 404
+          number = '002' ).
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD refresh_fixture_dry_run.
+    require_fixture( ).
+    DATA(result) = NEW zcl_be_maintainer( )->refresh( VALUE #( enhancement = 'zbe_test_so' dry_run = abap_true ) ).
+    cl_abap_unit_assert=>assert_equals(
+      act = result-operation
+      exp = zcl_be_maintainer=>operation-refresh ).
+    cl_abap_unit_assert=>assert_true( result-dry_run ).
+    cl_abap_unit_assert=>assert_false( result-correction_failed ).
   ENDMETHOD.
 
   METHOD check_fixture_read_only.

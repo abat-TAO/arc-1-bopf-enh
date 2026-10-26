@@ -541,6 +541,13 @@ CLASS zcl_be_reader IMPLEMENTATION.
                                               WHEN /bobf/if_conf_c=>sc_detpattern_fill_trans_attr THEN `fillTransient`
                                               WHEN /bobf/if_conf_c=>sc_detpattern_create_property THEN `properties`
                                               WHEN /bobf/if_conf_c=>sc_detpattern_set_trans_node  THEN `transientNode`
+                                              WHEN /bobf/if_conf_c=>sc_detpattern_after_fail_save THEN `afterFailedSave`
+                                              WHEN /bobf/if_conf_c=>sc_detpattern_draw_numbers    THEN `drawNumbers`
+                                              WHEN /bobf/if_conf_c=>sc_detpattern_during_save     THEN `duringSave`
+                                              WHEN /bobf/if_conf_c=>sc_detpattern_after_succ_save THEN `afterSuccessfulSave`
+                                              WHEN /bobf/if_conf_c=>sc_detpattern_after_cleanup   THEN `afterCleanup`
+                                              WHEN /bobf/if_conf_c=>sc_detpattern_check_determine THEN `checkAndDetermine`
+                                              WHEN /bobf/if_conf_c=>sc_detpattern_undefined       THEN `undefined`
                                               ELSE determination->det_pattern )
                       class       = determination->det_class
                       is_own      = xsdbool( determination->origin_bo_key = bo_key )

@@ -33,6 +33,14 @@ CLASS zcx_be_error DEFINITION
       RAISING
         zcx_be_error.
 
+    "! SAP's Check & Correct failed; the first BOPF error becomes the previous exception
+    CLASS-METHODS raise_not_corrected
+      IMPORTING
+        name     TYPE csequence
+        messages TYPE REF TO /bobf/if_frw_message OPTIONAL
+      RAISING
+        zcx_be_error.
+
     CLASS-METHODS raise_unknown_business_object
       IMPORTING
         name TYPE csequence
@@ -136,6 +144,13 @@ CLASS zcx_be_error IMPLEMENTATION.
 
   METHOD raise_not_saved.
     RAISE EXCEPTION TYPE zcx_be_error MESSAGE e018(zbe_bopf_enh) WITH entity_type name
+      EXPORTING status   = 422
+                previous = get_first_error( messages ).
+  ENDMETHOD.
+
+
+  METHOD raise_not_corrected.
+    RAISE EXCEPTION TYPE zcx_be_error MESSAGE e036(zbe_bopf_enh) WITH name
       EXPORTING status   = 422
                 previous = get_first_error( messages ).
   ENDMETHOD.

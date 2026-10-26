@@ -9,11 +9,11 @@ service on SAP's BOPF configuration API and an ARC-1 extension with four tools. 
 then read, create, change, check and delete enhancement objects and their nodes, actions, determinations,
 validations, queries, associations and alternative keys.
 
-> **Status: 0.1.0.** Verified live on SAP_BASIS 816 (S/4HANA 2025): the ABAP Platform trial with the EPM sales
-> order, and an S/4HANA system with SAP TM and the freight order `/SCMTMS/TOR`, both on-premise. Private cloud and
-> older releases such as S/4HANA 2023 should work as well but are not tested yet. Built against ARC-1 1.5.0, verified
-> with ARC-1 1.4.0 and 1.5.0. ARC-1 still marks its plugin API (`apiVersion` 1) as experimental, so a later ARC-1
-> release may need an update of this extension.
+> **Status: 0.2.0.** Verified live on-premise with S/4HANA 2025 (SAP_BASIS 816), on the ABAP Platform trial with the
+> EPM sales order and on an SAP TM system with the freight order `/SCMTMS/TOR`, and with S/4HANA 2023 (SAP_BASIS 758)
+> on an SAP TM system. Private cloud and older releases should work as well but are not tested yet. Built against and
+> verified with ARC-1 1.9.0; needs ARC-1 1.5.0 or later. ARC-1 still marks its plugin API (`apiVersion` 1) as
+> experimental, so a later ARC-1 release may need an update of this extension.
 
 ## Tools
 
@@ -22,7 +22,7 @@ validations, queries, associations and alternative keys.
 | `Custom_BopfEnhRead` | `read` | Extensible business objects, their enhancements, one enhancement with its entities, and the names SAP proposes before a create |
 | `Custom_BopfEnhWrite` | `write`, create | Create and change enhancements and their entities; every change runs as a dry run first |
 | `Custom_BopfEnhDelete` | `write`, delete | Delete own entities or a whole enhancement: preview with token, then deletion |
-| `Custom_BopfEnhMaintain` | `write`, update | BOPF consistency check; refresh after appends to standard nodes |
+| `Custom_BopfEnhMaintain` | `write`, update | BOPF consistency check; Check & Correct; refresh after appends to standard nodes |
 
 [docs/tools.md](docs/tools.md) describes parameters, results, errors and the typical flows.
 
@@ -30,8 +30,8 @@ validations, queries, associations and alternative keys.
 
 This path runs ARC-1 locally, started by your MCP client. For Docker and SAP BTP, see [Deployment](#deployment).
 
-**You need** an SAP system with classic BOPF, tested with S/4HANA 2025 (SAP_BASIS 816) on-premise (private cloud
-and older releases should work but are not tested yet); [abapGit](https://abapgit.org) in that system; and an SAP
+**You need** an SAP system with classic BOPF, tested with S/4HANA 2023 and 2025 on-premise (private cloud and older
+releases should work but are not tested yet); [abapGit](https://abapgit.org) in that system; and an SAP
 user with developer authorization (`S_DEVELOP`) for the packages of the enhancements. Building the extension
 yourself also needs Node.js 22.19 or later on Linux, macOS or WSL (the build scripts use POSIX shell commands).
 
@@ -100,6 +100,8 @@ ARC-1 loads the extension as a file at startup, wherever ARC-1 runs:
 - **SAP's API, not table writes.** The service works through `/BOBF/CL_CONF_MODEL_API`, the API behind the BOPF
   designer, and reads the BOPF meta model directly only where that API has gaps, such as alternative keys and the
   consistency check.
+- **Consistent after every change.** The configuration API leaves entries behind that its own consistency check
+  reports as lost elements. Every change therefore ends with Check & Correct, as in the BOPF designer.
 - **Thin extension.** The TypeScript side holds the parameter schemas, runs the dry run before every change and
   applies the package and transport settings of the ARC-1 server.
 - **Source code stays with ARC-1.** Implementation classes are generated as stubs. Implementing them, and creating
@@ -153,8 +155,8 @@ the enhancement, here `ZENH`, so the node becomes `ZENH_NOTES`:
   `/SCMTMS/TOR`; combine it with `node`.
 - The consistency check assigns findings to the standard object by the element SAP reports them for. Findings
   without such an element count as findings of the enhancement.
-- Tested only with S/4HANA 2025 (SAP_BASIS 816) on-premise. Private cloud and older releases such as S/4HANA 2023
-  should work as well but are not tested yet.
+- Tested only with S/4HANA 2023 and 2025 on-premise. Private cloud and older releases should work as well but are
+  not tested yet.
 - ARC-1 stops every HTTP request to SAP after 120 seconds. A write makes two requests: the dry run and the change.
 - Not available on SAP BTP ABAP Environment and S/4HANA Public Cloud, on ARC-1's multi-target routes and in ARC-1's
   `hyperfocused` tool mode; see [docs/deployment.md](docs/deployment.md).

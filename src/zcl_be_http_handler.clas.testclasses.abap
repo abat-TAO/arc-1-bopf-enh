@@ -1,6 +1,7 @@
 CLASS ltcl_http_server DEFINITION FINAL FOR TESTING RISK LEVEL HARMLESS DURATION SHORT.
   PUBLIC SECTION.
     INTERFACES if_http_server PARTIALLY IMPLEMENTED.
+    CONSTANTS csrf_token TYPE string VALUE `UNIT_CSRF_TOKEN`.
     METHODS constructor.
 ENDCLASS.
 
@@ -8,6 +9,10 @@ CLASS ltcl_http_server IMPLEMENTATION.
   METHOD constructor.
     if_http_server~request = NEW cl_http_request( add_c_msg = 1 ).
     if_http_server~response = NEW cl_http_response( add_c_msg = 1 ).
+  ENDMETHOD.
+
+  METHOD if_http_server~validate_xsrf_token.
+    successful = xsdbool( token = csrf_token ).
   ENDMETHOD.
 ENDCLASS.
 
@@ -24,7 +29,10 @@ CLASS ltcl_names_http DEFINITION FINAL FOR TESTING RISK LEVEL HARMLESS DURATION 
       END OF error_response,
       BEGIN OF names_response,
         result TYPE zcl_be_writer=>names,
-      END OF names_response.
+      END OF names_response,
+      BEGIN OF maintain_response,
+        result TYPE zcl_be_maintainer=>change_result,
+      END OF maintain_response.
     DATA server TYPE REF TO if_http_server.
     METHODS setup.
     METHODS get_names_returns_json FOR TESTING.
@@ -32,6 +40,12 @@ CLASS ltcl_names_http DEFINITION FINAL FOR TESTING RISK LEVEL HARMLESS DURATION 
     METHODS get_names_requires_name FOR TESTING.
     METHODS get_names_rejects_update FOR TESTING.
     METHODS enhancement_passes_node FOR TESTING RAISING cx_static_check.
+    METHODS post_correct_dry_run FOR TESTING RAISING cx_static_check.
+    METHODS post_refresh_dry_run FOR TESTING RAISING cx_static_check.
+    METHODS require_fixture RAISING cx_static_check.
+    METHODS assert_maintain_dry_run IMPORTING
+      operation TYPE string
+      RAISING cx_static_check.
     METHODS assert_http_error IMPORTING
       status TYPE i
       number TYPE string.
@@ -123,5 +137,49 @@ CLASS ltcl_names_http IMPLEMENTATION.
                                         exp = 'ZBE_BOPF_ENH' ).
     cl_abap_unit_assert=>assert_equals( act = response-messages[ 1 ]-number
                                         exp = number ).
+  ENDMETHOD.
+
+  METHOD post_correct_dry_run.
+    assert_maintain_dry_run( zcl_be_maintainer=>operation-correct ).
+  ENDMETHOD.
+
+  METHOD post_refresh_dry_run.
+    assert_maintain_dry_run( zcl_be_maintainer=>operation-refresh ).
+  ENDMETHOD.
+
+  METHOD require_fixture.
+    TRY.
+        NEW zcl_be_change_context( )->find_business_object( 'ZBE_TEST_SO' ).
+      CATCH zcx_be_error INTO DATA(error).
+        IF error->status = 404 AND error->if_t100_message~t100key-msgid = 'ZBE_BOPF_ENH'
+            AND error->if_t100_message~t100key-msgno = '001'.
+          cl_abap_unit_assert=>skip( 'Test data missing: run ZCL_BE_TEST_FIXTURE first' ).
+          RETURN.
+        ENDIF.
+        RAISE EXCEPTION error.
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD assert_maintain_dry_run.
+    DATA response TYPE maintain_response.
+    require_fixture( ).
+    server->request->set_method( 'POST' ).
+    server->request->set_header_field( name  = '~path_info'
+                                       value = '/write' ).
+    server->request->set_header_field( name  = 'x-csrf-token'
+                                       value = ltcl_http_server=>csrf_token ).
+    server->request->set_content_type( 'application/json' ).
+    server->request->set_cdata( |\{"operation":"{ operation }","enhancement":"ZBE_TEST_SO","dryRun":true\}| ).
+    NEW zcl_be_http_handler( )->if_http_extension~handle_request( server ).
+    server->response->get_status( IMPORTING code = DATA(status) ).
+    cl_abap_unit_assert=>assert_equals( act = status
+                                        exp = 200 ).
+    zcl_be_json=>from_json( EXPORTING json = server->response->get_cdata( ) CHANGING data = response ).
+    cl_abap_unit_assert=>assert_equals( act = response-result-operation
+                                        exp = operation ).
+    cl_abap_unit_assert=>assert_equals( act = response-result-enhancement
+                                        exp = 'ZBE_TEST_SO' ).
+    cl_abap_unit_assert=>assert_true( response-result-dry_run ).
+    cl_abap_unit_assert=>assert_false( response-result-correction_failed ).
   ENDMETHOD.
 ENDCLASS.

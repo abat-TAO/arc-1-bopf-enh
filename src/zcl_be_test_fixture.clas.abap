@@ -7,6 +7,7 @@ CLASS zcl_be_test_fixture IMPLEMENTATION.
   METHOD if_oo_adt_classrun~main.
     DATA result TYPE zcl_be_writer=>result.
     DATA status TYPE string.
+    DATA current TYPE string.
     TYPES requests TYPE STANDARD TABLE OF zcl_be_writer=>request WITH EMPTY KEY.
     " Only these fixed create requests are executed; existing entities are never updated or deleted.
     DATA(steps) = VALUE requests(
@@ -59,13 +60,18 @@ CLASS zcl_be_test_fixture IMPLEMENTATION.
     DATA(writer) = NEW zcl_be_writer( ).
     TRY.
         LOOP AT steps ASSIGNING FIELD-SYMBOL(<step>).
+          current = |{ <step>-operation } { <step>-name }|.
           result = writer->write( VALUE #( BASE <step>
             enhancement = 'ZBE_TEST_SO' language = 'E' dry_run = abap_false ) ).
           status = COND #( WHEN result-already_existed = abap_true THEN `alreadyExisted` ELSE `created` ).
-          out->write( |{ <step>-operation } { <step>-name }: { status }| ).
+          out->write( |{ current }: { status }| ).
         ENDLOOP.
+        " Existing entities are not saved again and therefore not corrected; this also repairs older fixtures
+        current = |{ zcl_be_maintainer=>operation-correct } ZBE_TEST_SO|.
+        NEW zcl_be_maintainer( )->correct( VALUE #( enhancement = 'ZBE_TEST_SO' ) ).
+        out->write( |{ current }: done| ).
       CATCH cx_root INTO DATA(error).
-        out->write( |{ <step>-operation } { <step>-name }: { error->get_text( ) }| ).
+        out->write( |{ current }: { error->get_text( ) }| ).
     ENDTRY.
   ENDMETHOD.
 ENDCLASS.

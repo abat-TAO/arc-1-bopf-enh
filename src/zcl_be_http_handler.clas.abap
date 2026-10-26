@@ -191,8 +191,10 @@ CLASS zcl_be_http_handler IMPLEMENTATION.
         RAISE EXCEPTION TYPE zcx_be_error MESSAGE e006(zbe_bopf_enh) EXPORTING status = 400.
       WHEN zcl_be_deleter=>operation.
         result = zcl_be_json=>to_json( NEW zcl_be_deleter( )->delete( change_request ) ).
-      WHEN zcl_be_maintainer=>operation.
+      WHEN zcl_be_maintainer=>operation-refresh.
         result = zcl_be_json=>to_json( NEW zcl_be_maintainer( )->refresh( change_request ) ).
+      WHEN zcl_be_maintainer=>operation-correct.
+        result = zcl_be_json=>to_json( NEW zcl_be_maintainer( )->correct( change_request ) ).
       WHEN OTHERS.
         result = zcl_be_json=>to_json( NEW zcl_be_writer( )->write( change_request ) ).
     ENDCASE.
