@@ -132,6 +132,8 @@ export const writeTool: PluginToolDefinition = {
   description:
     'Create or change classic BOPF enhancement objects (enhancements of SAP standard business objects, e.g. SAP TM). ' +
     'One call is one change and is saved immediately; creating an existing name returns alreadyExisted. ' +
+    'Every saved change ends with Check & Correct of the BOPF designer; correctionFailed means the change is saved ' +
+    'but the correction failed: run Custom_BopfEnhMaintain correct. ' +
     'Implementation classes are generated as stubs (result.class): implement their methods afterwards with SAPWrite. ' +
     'result.generated lists every object BOPF generates (also in a dry run). Generated names cannot be changed later: ' +
     'when the user did not name the objects, get the proposals with Custom_BopfEnhRead what=names or a dryRun, ' +

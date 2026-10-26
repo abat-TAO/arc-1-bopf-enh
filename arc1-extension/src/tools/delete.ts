@@ -39,7 +39,10 @@ export const deleteTool: PluginToolDefinition = {
     '(subnodes, entities on deleted nodes, validations of deleted actions, generated DDIC objects), what stays ' +
     '(implementation classes, DDIC objects created by the developer) and a token. ' +
     'Show the preview to the user, then call again with that token to delete exactly that. ' +
-    'The token becomes invalid as soon as the enhancement changes. A node whose database table contains data is not deleted.',
+    'The token becomes invalid as soon as the enhancement changes. A node whose database table contains data is not deleted. ' +
+    'Deleting entities ends with Check & Correct of the BOPF designer, which also removes configuration entries ' +
+    'nothing uses anymore; the preview does not list them. correctionFailed means the deletion is done but the ' +
+    'correction failed: run Custom_BopfEnhMaintain correct.',
   schema,
   policy: { scope: 'write', opType: 'D' },
   availableOn: 'onprem',

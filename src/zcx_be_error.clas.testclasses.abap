@@ -4,6 +4,9 @@ CLASS ltcl_bopf_exception DEFINITION FINAL FOR TESTING RISK LEVEL HARMLESS DURAT
       error TYPE REF TO zcx_be_error
       status TYPE i
       number TYPE symsgno.
+    METHODS assert_correction_error IMPORTING
+      severity TYPE string
+      RAISING cx_static_check.
     METHODS default_status_is_400 FOR TESTING RAISING cx_static_check.
     METHODS preserve_status_and_previous FOR TESTING RAISING cx_static_check.
     METHODS unbound_messages_have_no_error FOR TESTING RAISING cx_static_check.
@@ -12,6 +15,8 @@ CLASS ltcl_bopf_exception DEFINITION FINAL FOR TESTING RISK LEVEL HARMLESS DURAT
     METHODS accept_abort_and_exit FOR TESTING RAISING cx_static_check.
     METHODS not_saved_keeps_first_error FOR TESTING RAISING cx_static_check.
     METHODS not_saved_without_messages FOR TESTING RAISING cx_static_check.
+    METHODS not_corrected_keeps_error FOR TESTING RAISING cx_static_check.
+    METHODS not_corrected_without_messages FOR TESTING RAISING cx_static_check.
 ENDCLASS.
 CLASS ltcl_bopf_exception IMPLEMENTATION.
   METHOD assert_error.
@@ -117,6 +122,54 @@ CLASS ltcl_bopf_exception IMPLEMENTATION.
         error  = error
         status = 422
         number = '018' ).
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD not_corrected_keeps_error.
+    LOOP AT VALUE string_table( ( `E` ) ( `A` ) ( `X` ) ) ASSIGNING FIELD-SYMBOL(<severity>).
+      assert_correction_error( <severity> ).
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD assert_correction_error.
+    DATA(messages) = /bobf/cl_frw_factory=>get_message( ).
+    DATA(first_error) = NEW /bobf/cm_frw_symsg( severity = CONV #( severity ) ).
+    messages->add_cm( NEW /bobf/cm_frw_symsg( severity = 'W' ) ).
+    messages->add_cm( NEW /bobf/cm_frw_symsg( severity = 'I' ) ).
+    messages->add_cm( first_error ).
+    messages->add_cm( NEW /bobf/cm_frw_symsg( severity = COND #( WHEN severity = `E` THEN 'A' ELSE 'E' ) ) ).
+    TRY.
+        zcx_be_error=>raise_not_corrected(
+          name     = 'ZBE_TEST_SO'
+          messages = messages ).
+        cl_abap_unit_assert=>fail( 'Expected correction rejection' ).
+      CATCH zcx_be_error INTO DATA(error).
+        assert_error(
+          error  = error
+          status = 422
+          number = '036' ).
+        cl_abap_unit_assert=>assert_equals(
+          act = error->previous
+          exp = first_error ).
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD not_corrected_without_messages.
+    TRY.
+        zcx_be_error=>raise_not_corrected( 'ZBE_TEST_SO' ).
+        cl_abap_unit_assert=>fail( 'Expected ZBE_BOPF_ENH 036' ).
+      CATCH zcx_be_error INTO DATA(error).
+        assert_error(
+          error  = error
+          status = 422
+          number = '036' ).
+        cl_abap_unit_assert=>assert_equals(
+          act = error->if_t100_message~t100key-attr1
+          exp = 'IF_T100_DYN_MSG~MSGV1' ).
+        cl_abap_unit_assert=>assert_equals(
+          act = error->if_t100_dyn_msg~msgv1
+          exp = 'ZBE_TEST_SO' ).
+        cl_abap_unit_assert=>assert_not_bound( error->previous ).
     ENDTRY.
   ENDMETHOD.
 ENDCLASS.

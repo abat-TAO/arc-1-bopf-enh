@@ -27,14 +27,16 @@ CLASS zcl_be_deleter DEFINITION
 
     TYPES:
       BEGIN OF result,
-        operation   TYPE string,
-        enhancement TYPE string,
-        entity_type TYPE string,
-        name        TYPE string,
-        package     TYPE string,
-        transport   TYPE string,
-        deleted     TYPE entries,
-        remains     TYPE entries,
+        operation         TYPE string,
+        enhancement       TYPE string,
+        entity_type       TYPE string,
+        name              TYPE string,
+        package           TYPE string,
+        transport         TYPE string,
+        deleted           TYPE entries,
+        remains           TYPE entries,
+        "! The deletion is done, but Check & Correct failed afterwards
+        correction_failed TYPE abap_bool,
       END OF result.
 
     CONSTANTS operation TYPE string VALUE `delete`.
@@ -215,6 +217,11 @@ CLASS zcl_be_deleter DEFINITION
       RAISING
         zcx_be_error.
 
+    "! Check & Correct of the enhancement after the deletion
+    METHODS correct
+      RAISING
+        zcx_be_error.
+
     METHODS execute_step
       IMPORTING
         step TYPE step
@@ -283,6 +290,17 @@ CLASS zcl_be_deleter IMPLEMENTATION.
                       transport   = context-transport
                       deleted     = get_deletes( )
                       remains     = plan-remains ).
+
+    " The configuration API leaves entries behind that the consistency check reports as lost elements
+    IF request-entity_type <> `enhancement`.
+      TRY.
+          correct( ).
+        CATCH cx_root.
+          " The deletion is done; the caller learns it from the result instead of repeating it, and the
+          " maintenance operation correct reports the cause
+          result-correction_failed = abap_true.
+      ENDTRY.
+    ENDIF.
   ENDMETHOD.
 
 
@@ -700,6 +718,19 @@ CLASS zcl_be_deleter IMPLEMENTATION.
             RAISE EXCEPTION TYPE zcx_be_error MESSAGE e029(zbe_bopf_enh) WITH <step>-type <step>-name EXPORTING status = 422.
           ENDIF.
         ENDLOOP.
+      CLEANUP.
+        session->close( ).
+    ENDTRY.
+    session->close( ).
+  ENDMETHOD.
+
+
+  METHOD correct.
+    DATA(session) = NEW zcl_be_session( package = context-package
+                                        request = context-transport ).
+    TRY.
+        NEW zcl_be_meta_model( )->correct( bo_key = context-enhancement-bo_key
+                                           name   = context-enhancement-bo_name ).
       CLEANUP.
         session->close( ).
     ENDTRY.

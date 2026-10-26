@@ -9,10 +9,10 @@
 | `ZCL_BE_HTTP_HANDLER` | ICF handler of `/sap/bc/zbe_bopf_enh/`: routing, CSRF protection of writes, `{"result": …}` and `{"messages": […]}` answers with HTTP status |
 | `ZCL_BE_JSON` | JSON conversion of the HTTP contract: camelCase names, initial values left out |
 | `ZCL_BE_READER` | Read access to business objects, enhancements and their entities |
-| `ZCL_BE_WRITER` | Create and update operations and the names lookup, through `/BOBF/CL_CONF_MODEL_API`: every request is checked, written and read back |
+| `ZCL_BE_WRITER` | Create and update operations and the names lookup, through `/BOBF/CL_CONF_MODEL_API`: every request is checked, written and read back, and every saved change ends with Check & Correct |
 | `ZCL_BE_DELETER` | Two-step deletion: preview in execution order, token, delete |
-| `ZCL_BE_MAINTAINER` | Consistency check and refresh |
-| `ZCL_BE_META_MODEL` | Direct access to the BOPF meta model for what the configuration API lacks: alternative keys, deleting actions, the consistency check |
+| `ZCL_BE_MAINTAINER` | Consistency check, Check & Correct and refresh |
+| `ZCL_BE_META_MODEL` | Direct access to the BOPF meta model for what the configuration API lacks: alternative keys, deleting actions, the consistency check, Check & Correct |
 | `ZCL_BE_CHANGE_CONTEXT` | Checks required for every change: enhancement, customer namespace, authorization, package, transport request, language |
 | `ZCL_BE_SESSION` | Dialog-free session for the configuration API, the only place that sets the switches of `/BOBF/CL_CONF_TOOLBOX` |
 | `ZCX_BE_ERROR` | Exception with a message of `ZBE_BOPF_ENH` and an HTTP status |
@@ -46,7 +46,7 @@ with a JSON body: ARC-1 treats every `POST` of an extension as a write, which ne
 | `GET names?operation=&name=&enhancement=&node=&baseAction=&action=` | Name proposals for a planned create |
 | `GET deletepreview?enhancement=&entityType=&name=&transport=` | Delete preview with token |
 | `GET check?enhancement=` | Consistency check |
-| `POST write` | Body `{"operation": …}`: every create and update operation, `delete` (with token) and `refresh`; `dryRun: true` checks only |
+| `POST write` | Body `{"operation": …}`: every create and update operation, `delete` (with token), `refresh` and `correct`; `dryRun: true` checks only |
 
 `POST` needs a CSRF token, which ARC-1 fetches on its own.
 
@@ -69,7 +69,8 @@ Most tests need the test enhancement `ZBE_TEST_SO` of the EPM demo business obje
 
 1. Run `ZCL_BE_TEST_FIXTURE` as a console application (F9 in ADT). It creates the enhancement in `$TMP` with nodes,
    actions, action enhancements, determinations, validations, a query, an association and an alternative key, and
-   prints one line per step. Existing entities are left as they are, so it can run again.
+   prints one line per step. Existing entities are left as they are, so it can run again. It ends with Check &
+   Correct, which also repairs a fixture created by an older version.
 2. Run the ABAP Unit tests of the package. Without the test enhancement, the tests that need it are skipped.
 
 The tests only read the test enhancement and use dry runs; they do not change it. The test classes are

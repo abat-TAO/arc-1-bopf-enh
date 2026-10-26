@@ -136,6 +136,7 @@ CLASS ltcl_enhancement_writer IMPLEMENTATION.
     DATA(result) = writer->write( VALUE #( operation = 'updateEnhancement' enhancement = 'ZBE_TEST_SO'
       description = 'Unit dry run only' dry_run = abap_true ) ).
     cl_abap_unit_assert=>assert_true( result-dry_run ).
+    cl_abap_unit_assert=>assert_false( result-correction_failed ).
     cl_abap_unit_assert=>assert_equals( act = result-entity
                                         exp = 'ZBE_TEST_SO' ).
     cl_abap_unit_assert=>assert_initial( result-generated ).
@@ -310,6 +311,7 @@ CLASS ltcl_enhancement_writer IMPLEMENTATION.
       base_business_object = '/BOBF/EPM_SALES_ORDER' package = '$TMP'
       constants_interface = 'zif_be_unit_names' dry_run = abap_true ) ).
     cl_abap_unit_assert=>assert_true( result-dry_run ).
+    cl_abap_unit_assert=>assert_false( result-correction_failed ).
     cl_abap_unit_assert=>assert_false( result-already_existed ).
     cl_abap_unit_assert=>assert_equals( act = result-class
                                         exp = 'ZIF_BE_UNIT_NAMES' ).
@@ -343,6 +345,7 @@ CLASS ltcl_enhancement_writer IMPLEMENTATION.
       ( type = `combinedTableType` name = `ZBE_T_UNIT_NAMES_C` ) ).
     INSERT VALUE #( type = `databaseTable` name = `ZBE_D_UNIT_NAMES` ) INTO TABLE expected.
     cl_abap_unit_assert=>assert_true( result-dry_run ).
+    cl_abap_unit_assert=>assert_false( result-correction_failed ).
     cl_abap_unit_assert=>assert_false( result-already_existed ).
     cl_abap_unit_assert=>assert_equals( act = result-class
                                         exp = 'ZBE_S_UNIT_NAMES_C' ).
@@ -363,6 +366,7 @@ CLASS ltcl_enhancement_writer IMPLEMENTATION.
       ( type = `combinedStructure` name = `ZBE_S_UNIT_NAMES_C` )
       ( type = `combinedTableType` name = `ZBE_T_UNIT_NAMES_C` ) ).
     cl_abap_unit_assert=>assert_true( result-dry_run ).
+    cl_abap_unit_assert=>assert_false( result-correction_failed ).
     cl_abap_unit_assert=>assert_false( result-already_existed ).
     cl_abap_unit_assert=>assert_equals( act = result-class
                                         exp = 'ZBE_S_UNIT_NAMES_C' ).
@@ -465,6 +469,7 @@ CLASS ltcl_enhancement_writer IMPLEMENTATION.
         timing = 'pre' class = 'ZCL_BE_UNIT_NAMES' target_business_object = 'ZBE_TEST_SO'
         target_node = 'ROOT' dry_run = abap_true ) ).
       cl_abap_unit_assert=>assert_true( result-dry_run ).
+      cl_abap_unit_assert=>assert_false( result-correction_failed ).
       cl_abap_unit_assert=>assert_false( result-already_existed ).
       cl_abap_unit_assert=>assert_equals( act = result-generated
                                           exp = VALUE zcl_be_writer=>generated_objects(
@@ -510,6 +515,7 @@ CLASS ltcl_enhancement_writer IMPLEMENTATION.
           target_business_object = '/BOBF/EPM_PRODUCT' target_node = 'ROOT' ) ) ASSIGNING FIELD-SYMBOL(<request>).
       result = writer->write( VALUE #( BASE <request> enhancement = 'ZBE_TEST_SO' dry_run = abap_true ) ).
       cl_abap_unit_assert=>assert_true( result-already_existed ).
+      cl_abap_unit_assert=>assert_false( result-correction_failed ).
       cl_abap_unit_assert=>assert_initial( result-generated ).
     ENDLOOP.
   ENDMETHOD.
@@ -617,6 +623,7 @@ CLASS ltcl_enhancement_writer IMPLEMENTATION.
       name = 'ZBE_TEST_UNIT_NAMES' base_action = base_action timing = 'pre'
       class = 'ZCL_BE_UNIT_NAMES' dry_run = abap_true ) ).
     cl_abap_unit_assert=>assert_false( result-already_existed ).
+    cl_abap_unit_assert=>assert_false( result-correction_failed ).
     cl_abap_unit_assert=>assert_equals( act = result-generated
                                         exp = VALUE zcl_be_writer=>generated_objects(
       ( type = `class` name = `ZCL_BE_UNIT_NAMES` ) ) ).
@@ -642,6 +649,7 @@ CLASS ltcl_enhancement_writer IMPLEMENTATION.
     DATA(result) = writer->write( VALUE #( operation = 'updateAction' enhancement = 'ZBE_TEST_SO'
       name = 'ZBE_TEST_RELEASE' class = class dry_run = abap_true ) ).
     cl_abap_unit_assert=>assert_true( result-unchanged ).
+    cl_abap_unit_assert=>assert_false( result-correction_failed ).
     cl_abap_unit_assert=>assert_initial( result-generated ).
   ENDMETHOD.
 
@@ -978,6 +986,7 @@ CLASS ltcl_enhancement_writer IMPLEMENTATION.
     DATA(result) = writer->write( VALUE #( operation = 'updateNode' enhancement = 'zbe_test_so'
       name = 'zbe_test_note' description = 'Unit dry run only' dry_run = abap_true ) ).
     cl_abap_unit_assert=>assert_true( result-dry_run ).
+    cl_abap_unit_assert=>assert_false( result-correction_failed ).
     cl_abap_unit_assert=>assert_equals(
       act = result-enhancement
       exp = 'ZBE_TEST_SO' ).
@@ -1108,6 +1117,7 @@ CLASS ltcl_enhancement_writer IMPLEMENTATION.
     DATA(result) = writer->write( VALUE #( operation = 'createEnhancement' name = 'ZBE_TEST_SO'
       base_business_object = '/BOBF/EPM_SALES_ORDER' package = '$TMP' dry_run = abap_true ) ).
     cl_abap_unit_assert=>assert_true( result-already_existed ).
+    cl_abap_unit_assert=>assert_false( result-correction_failed ).
     cl_abap_unit_assert=>assert_equals(
       act = result-package
       exp = '$TMP'

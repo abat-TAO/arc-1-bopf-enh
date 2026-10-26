@@ -6,7 +6,7 @@ import { writeTool } from './tools/write.js';
 
 const plugin: Plugin = {
   name: 'bopf-enh',
-  version: '0.1.0',
+  version: '0.2.0',
   apiVersion: 1,
   tools: [readTool, writeTool, deleteTool, maintainTool],
 };
