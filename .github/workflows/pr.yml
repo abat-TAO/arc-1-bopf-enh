@@ -13,22 +13,26 @@ jobs:
   abaplint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: '24'
 
-      - uses: reviewdog/action-setup@v1
+      # abaplint, in the version of the root package.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f # v1.5.0
         with:
-          reviewdog_version: latest
+          # Not tracked by Dependabot; update by hand.
+          reviewdog_version: v0.21.2
 
       # Only new findings of this pull request fail the check.
       - name: abaplint
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --yes @abaplint/cli@2.120.68 --format checkstyle > abaplint.xml || true
+          npx --no -- abaplint --format checkstyle > abaplint.xml || true
           reviewdog -f=checkstyle -name=abaplint -reporter=github-pr-check \
             -filter-mode=added -fail-level=error < abaplint.xml
 
@@ -38,9 +42,9 @@ jobs:
       run:
         working-directory: arc1-extension
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: '24'
 

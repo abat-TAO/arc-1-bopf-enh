@@ -1,0 +1,54 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /arc1-extension
+    schedule:
+      interval: weekly
+      day: saturday
+      time: '06:00'
+      timezone: Europe/Berlin
+    cooldown:
+      default-days: 5
+    groups:
+      # zod must stay at ARC-1's version, or the tool schemas no longer type-check.
+      arc-1:
+        patterns: [arc-1, zod]
+      build-tools:
+        patterns: [esbuild, typescript, '@types/node']
+    ignore:
+      # @types/node follows the minimum supported Node version in engines.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: saturday
+      time: '06:00'
+      timezone: Europe/Berlin
+    cooldown:
+      default-days: 5
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: saturday
+      time: '06:00'
+      timezone: Europe/Berlin
+    cooldown:
+      default-days: 5
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: chore
+      include: scope

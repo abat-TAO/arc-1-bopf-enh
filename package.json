@@ -1,0 +1,8 @@
+{
+  "name": "arc-1-bopf-enh",
+  "private": true,
+  "description": "Code checks for the ABAP sources",
+  "devDependencies": {
+    "@abaplint/cli": "2.120.85"
+  }
+}
