@@ -53,10 +53,11 @@ with a JSON body: ARC-1 treats every `POST` of an extension as a write, which ne
 ## Code style
 
 abaplint checks the ABAP code against `abaplint.jsonc` (Clean ABAP: no prefixes, descriptive English names, one
-place per message):
+place per message). The root `package.json` pins its version:
 
 ```bash
-npx @abaplint/cli abaplint.jsonc
+npm ci
+npx abaplint abaplint.jsonc
 ```
 
 SAP standard objects come from [abaplint/deps](https://github.com/abaplint/deps); clone it into `./deps` to work
@@ -96,6 +97,12 @@ Most of its size is zod, the schema library of the tool parameters. `dist/` is n
 
 - abaplint, reporting only the findings the pull request adds;
 - build, tests and tool listing of the extension.
+
+Dependabot (`.github/dependabot.yml`) proposes updates every Saturday for the packages of the extension, for abaplint
+and for the actions of the workflow, at the earliest five days after their release. arc-1 and zod come in one pull
+request, because zod has to stay at ARC-1's version. The workflow pins the actions by commit; the reviewdog version
+in the workflow is updated by hand. A green ARC-1 update is merged right away; the tests in the SAP systems run
+before each release.
 
 ## Third-party components
 
