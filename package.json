@@ -3,6 +3,6 @@
   "private": true,
   "description": "Code checks for the ABAP sources",
   "devDependencies": {
-    "@abaplint/cli": "2.120.85"
+    "@abaplint/cli": "2.120.86"
   }
 }
