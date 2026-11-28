@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@types/node": "22.20.5",
-    "arc-1": "1.10.1",
+    "arc-1": "1.11.0",
     "esbuild": "0.28.2",
     "typescript": "7.0.2",
     "zod": "4.6.7"
